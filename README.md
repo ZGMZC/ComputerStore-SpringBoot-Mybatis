@@ -189,7 +189,7 @@ public class StoreApplication {
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.cy.store.mapper">
+<mapper namespace="com.cy.store.mapper.UserMapper">
     <resultMap id="UserEntityMap" type="com.cy.store.entity.User">
         <id column="uid" property="uid"/>
         <result column="is_delete" property="isDelete"/>
@@ -417,18 +417,16 @@ public class UserController {
 ```java
 @RequestMapping("reg")
 public JsonResult<Void> reg(User user) {
-       public JsonResult<Void> reg(User user) {
         // 调用业务对象执行注册
         userService.reg(user);
         // 返回
         return new JsonResult<Void>(OK);
-    }
 }
 ```
 ###### 4. 编写测试
 启动项目，访问打开浏览器访问http://localhost:8080/users/reg?username=XXX&password=XXX 进行测试
-#####前端页面
-######1. 前后端通过Json传送数据
+##### 前端页面
+###### 1. 前后端通过Json传送数据
 在register.html页面中body标签内部的最后，添加script标签用于编写JavaScript程序。请求的url中需要添加项目的访问名称
 ```js
 <script type="text/javascript">
@@ -451,25 +449,25 @@ public JsonResult<Void> reg(User user) {
 	});
 </script>
 ```
-> serialize()方法通过序列化表单值，创建URL编码文吧字符串
+> serialize()方法通过序列化表单值，创建URL编码文本字符串
 
 ###### 2. 编写测试
 完成后启动项目，打开浏览器访问http://localhost:8080/web/register.html 页面并进行注册
 > 由于没有验证数据，即使没有填写用户名或密码，也可以注册成功
 
-####用户登录
-#####持久层
-######1. 规划SQL语句
+#### 用户登录
+##### 持久层
+###### 1. 规划SQL语句
 用户登录功能需要执行的SQL语句是根据用户名查询用户数据，再判断密码是否正确
 ```mysql
 select * from t_user where username=?
 ```
 > 以上SQL语句对应的后台开发已经完成， 无需再次开发
 
-######2. 接口与抽象方法
+###### 2. 接口与抽象方法
 > 无需再次开发
 
-######3.配置SQL映射
+###### 3.配置SQL映射
 > 无需再次开发
 
 ##### 业务层
@@ -477,7 +475,7 @@ select * from t_user where username=?
 1. 如果用户名不存在则登录失败，抛出UserNotFoundException异常
 2. 如果用户的isDelete字段的值为1，则表示当前用户数据被标记为“已删除”，需进行登录失败操作同时抛出UserNotFoundException
 3. 如果密码错误则进行登录失败操作，同时抛出PasswordNotMatchException异常
-######2. 接口与抽象方法
+###### 2. 接口与抽象方法
 在IUserService接口中添加登录功能的抽象方法
 ```java
 /**
@@ -714,7 +712,7 @@ update t_user set password=?, modified_user=?,modified_time=? where uid=?
 ```mysql
 select * from t_user where uid=?
 ```
-######2. 接口与抽象方法
+###### 2. 接口与抽象方法
 在UserMapper接口添加updatePasswordByUid(Integer uid,String password,String modifiedUser,Date modifiedTime)抽象方法
 ```java
 /**
@@ -804,7 +802,7 @@ public void changePassword(Integer uid, String username, String oldPassword, Str
 	// 判断查询结果中的password与oldMd5Password是否不一致
 	if (!result.getPassword().contentEquals(oldMd5Password)) {
 		// 是：抛出PasswordNotMatchException异常
-		throw new PasswordNotMatchException("原密码错误");
+		throw new PasswordNotMatchException("密码错误");
 	}
 	// 将参数newPassword结合盐值加密，得到newMd5Password
 	String newMd5Password = getMd5Password(newPassword, salt);
